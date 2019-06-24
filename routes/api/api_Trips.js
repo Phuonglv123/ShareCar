@@ -18,7 +18,17 @@ router.get('/allroute', (req, res) => {
             res.json(data)
         }
     })
-})
+});
+
+router.post('/search', (req, res) => {
+    Trips.find({
+        'locationFrom': req.body.locationFrom,
+        'locationTo': req.body.locationTo,
+    }, function (err, res) {
+        if (err) return err;
+        res.send(res)
+    })
+});
 
 // route    POST api/trips/create
 // desc     Create a trip
@@ -112,6 +122,7 @@ router.post('/finish/:id', passport.authenticate('jwt', {session: false}), (req,
         })
 
 });
+
 
 // route    POST api/trips/rate/:id
 // desc     Rate a trip
