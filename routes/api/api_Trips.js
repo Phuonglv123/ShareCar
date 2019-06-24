@@ -20,16 +20,6 @@ router.get('/allroute', (req, res) => {
     })
 });
 
-router.post('/search', (req, res) => {
-    Trips.find({
-        'locationFrom': req.body.locationFrom,
-        'locationTo': req.body.locationTo,
-    }, function (err, res) {
-        if (err) return err;
-        res.send(res)
-    })
-});
-
 // route    POST api/trips/create
 // desc     Create a trip
 // access   Private
@@ -52,7 +42,6 @@ router.post('/create', passport.authenticate('jwt', {session: false}), (req, res
 
                 const newTrip = new Trips({
                     driverID: driver._id,
-                    carInfo: driver.carInfo,
                     locationFrom: req.body.locationFrom,
                     locationTo: req.body.locationTo,
                     startTime: req.body.startTime,
@@ -65,7 +54,7 @@ router.post('/create', passport.authenticate('jwt', {session: false}), (req, res
 
                 newTrip.save()
                     .then(trip => {
-                        res.json({trip})
+                        res.json({trip},{driver})
                     })
                     .catch(err => console.log("Error", err))
             }
