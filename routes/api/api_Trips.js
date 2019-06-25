@@ -20,14 +20,19 @@ router.get('/allroute', (req, res) => {
     })
 });
 
-router.post('/search', (req, res) => {
-    Trips.find({
-        'locationFrom': req.body.locationFrom,
-        'locationTo': req.body.locationTo,
-    }, function (err, res) {
-        if (err) return err;
-        res.send(res)
-    })
+router.post('/search', (req, res, next) => {
+    var q = "^$"; // no data
+    if(req.body.locationFrom)
+        q = req.body.locationFrom;
+
+    Trips.find({locationFrom:{$regex: q,$options:'i'}}).select({"locationFrom": 1, 'locationTo': 1}).exec(function(err, data){
+        if (err){
+            return res.json(err)
+        } else {
+            res.json(data)
+            console.log(data)
+        }
+    });
 });
 
 // route    POST api/trips/create
@@ -106,7 +111,7 @@ router.post('/finish/:id', passport.authenticate('jwt', {session: false}), (req,
         .then(driver => {
             Trips.findById(req.params.id)
                 .then(trip => {
-                    if (trip.driverID == driver._id) {
+                    if (trip.driverID === driver._id) {
                         driver.numberOfTrips += 1;
                         driver.save()
                             .then(() => {
