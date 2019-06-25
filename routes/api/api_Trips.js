@@ -21,12 +21,14 @@ router.get('/allroute', (req, res) => {
 });
 
 router.post('/search', (req, res, next) => {
-    var q = "^$"; // no data
-    if(req.body.locationFrom)
-        q = req.body.locationFrom;
+    let from = "^$";
+    let to = '^$';
+    if (req.body.locationFrom)
+        from = req.body.locationFrom;
+        to = req.body.locationTo;
 
-    Trips.find({locationFrom:{$regex: q,$options:'i'}}).select({"locationFrom": 1, 'locationTo': 1}).exec(function(err, data){
-        if (err){
+    Trips.find({$or:[{locationFrom: {$regex: from, $options: 'i'}}, {locationTo:{$regex: to, $options: 'i'}}]}).exec(function (err, data) {
+        if (err) {
             return res.json(err)
         } else {
             res.json(data)
