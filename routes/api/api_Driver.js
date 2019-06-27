@@ -3,6 +3,7 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const passport = require('passport');
 const validatorPassRegis = require('../../validations/passengerRegister');
+const multer = require('multer')
 
 
 // load model
@@ -85,10 +86,18 @@ router.get('/detail/:id', (req, res) => {
 // route    POST localhost:4000/api/driver/detail
 // desc     register new account
 // access   PUBLIC
+const storage = multer.diskStorage({
+    destination: '../../utils/images',
+    filename(req, file, cb) {
+        cb(null, `${new Date()}-${file.originalname}`);
+    },
+});
+const upload = multer({storage});
 
-router.post('/detail', passport.authenticate('jwt', {session: false}), (req, res) => {
+router.post('/detail', upload.single('avatarDriver'), passport.authenticate('jwt', {session: false}), (req, res) => {
+
     const id = req.user.id;
-    const {birthday, gender, address, passportID, company, model, carInfo, manufacturingYear, licensePlate, numberOfSeats} = req.body;
+    const {birthday, gender, address, passportID, company, model, carInfo, manufacturingYear, licensePlate, numberOfSeats, avatarDriver } = req.body;
     AccountDriver.findOne({accountID: id})
         .then(account => {
             if (account) {
@@ -102,14 +111,15 @@ router.post('/detail', passport.authenticate('jwt', {session: false}), (req, res
                     birthday,
                     address, passportID, company, registerDate: new Date().getTime(),
                     numberOfTrips: 0,
-                    carInfo
-                })
+                    carInfo,
+                    avatarDriver
+                });
                 newDriver.save()
                     .then(driver => res.json({driver}))
                     .catch(err => console.log(err));
             }
         })
-})
+});
 
 
 module.exports = router;
