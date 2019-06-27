@@ -58,7 +58,7 @@ router.post('/create', passport.authenticate('jwt', {session: false}), (req, res
                 };
 
                 const newTrip = new Trips({
-                    driverID: driver._id,
+                    driverID: driver.accountID,
                     locationFrom: req.body.locationFrom,
                     locationTo: req.body.locationTo,
                     startTime: req.body.startTime,

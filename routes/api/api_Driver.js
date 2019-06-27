@@ -67,10 +67,9 @@ router.post('/register', async (req, res) => {
 router.get('/detail/:id', (req, res) => {
     const errors = {};
     const id = req.params.id;
-
     AccountDriver.findById(id)
         .then(user => {
-            AccountDriver.findOne({accountID: user._id})
+            AccountDriver.findOne({accountID: id})
                 .then(accountdriver => {
                     if (!accountdriver) {
                         errors.noProfile = 'There is no profile for this driver'
